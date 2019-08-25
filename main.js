@@ -1,84 +1,84 @@
 'use strict';
 const axios = require('axios');
 const EMAIL = require('./mail');
-const MY_PLAYERS = require('./players');
+const MY_PLAYERS_DATA = require('./players');
 const PLAYER_DANGER_VALUE = -80;
 
-/**
- *  [
-            "",(0)(unknown)
-            "Mustafi",(1)(name)
-            "Arsenal",(2)(team)
-            "D",(3)(position)
-            "A",(4)(status)
-            "0.5",(5)(owned)
-            "5.4",(6)
-            "£5.4m",(7)(price)
-            "0",(8)()
-            "---",(9)
-            "2525",(10)
-            "-33.3",(11)
-            "-33.3",(12)(target)
-            "-2",(13)
-            "-2",(14)
-            "Mustafi",(15)
-            "Spurs(H) Watford(A) Aston Villa(H) Man Utd(A) "(16)(opp teams)
-    ]
- * @param {*} unsafePlayers
- */
-
-function sendMail(unsafePlayers) {
-  let msg = '';
-  unsafePlayers.forEach(
-    player =>
-      (msg += `${player[1]} - ${player[2]}, ${player[12]}, Buffer: ${
-        player[10]
-      }\n`)
-  );
-  console.log('Calling Mail Fn');
-  EMAIL.sendMail(msg);
+function findTop8Buys(completePlayersData) {
+  console.log('Finding Top 8 Buys....');
+  let sortedPlayers = completePlayersData.sort((a,b) => a[12] - b[12]).reverse();
+  sortedPlayers = sortedPlayers.slice(0,8);
+  console.log('---------------');
+  console.log('Top 8 Buys');
+  console.table(sortedPlayers);
+  return sortedPlayers;
 }
 
-function isUnSafePlayer(player) {
-  return player[12] < PLAYER_DANGER_VALUE;
+function findTop5PlayersInPosition(playerPosition, completePlayersData) {
+  let filteredPlayers = completePlayersData.filter((player) => playerPosition === player[3]);
+  filteredPlayers.sort((a,b) => a[12] - b[12]).reverse();
+  return filteredPlayers.slice(0,5);
+}
+
+
+function findUnsafePositions(unsafePlayers) {
+  const unsafePositions = new Set();
+  unsafePlayers.forEach(player => unsafePositions.add(player[3]));
+  return unsafePositions;
+}
+
+function findBestReplacements(unsafePlayers,completePlayersData) {
+  let unsafePositions = findUnsafePositions(unsafePlayers);
+  let bestReplacementOptions = {};
+  unsafePositions.forEach(
+    position =>
+      (bestReplacementOptions[position] = findTop5PlayersInPosition(
+        position,
+        completePlayersData
+      ))
+  );
+  console.log('---------------');
+  console.log('Best Replacement Options');
+  console.table(bestReplacementOptions);
+  return bestReplacementOptions;
 }
 
 function findUnsafePlayers(players) {
-  let unsafePlayers = players.filter(player => isUnSafePlayer(player));
+  console.log('Finding Unsafe Players...');
+  let unsafePlayers = players.filter(
+    player => player[12] < PLAYER_DANGER_VALUE
+  );
   if (unsafePlayers.length) {
     console.log('Unsafe Players');
     console.log('------------------------');
     console.table(unsafePlayers);
-    sendMail(unsafePlayers);
-    return;
+    return unsafePlayers;
   }
   console.log('All players are safe.');
+  return unsafePlayers;
 }
 
 function lastNameMatches(playerA, playerB) {
-  return playerA[1].toLowerCase() === playerB.second_name.toLowerCase();
+  return playerA[1].toLowerCase() === playerB.last_name.toLowerCase();
 }
 
 function findPlayer(player, completePlayersList) {
-  return completePlayersList.filter(availablePlayer =>
+  let lastNameMatchingPlayers = completePlayersList.filter(availablePlayer =>
     lastNameMatches(availablePlayer, player)
   );
+  if(lastNameMatchingPlayers.length > 1) {
+    lastNameMatchingPlayers = lastNameMatchingPlayers.filter((clubPlayer) => clubPlayer[2] === player.club);
+  }
+  return lastNameMatchingPlayers[0];
 }
 
 function findMyPlayers(completePlayersData) {
-  console.log('Filtering Players...');
-  let filteredPlayers = [];
-  MY_PLAYERS.forEach(function(player) {
-    let playersFound = findPlayer(player, completePlayersData);
-    if (playersFound.length) {
-      playersFound.forEach(player => filteredPlayers.push(player));
-    }
-  });
-  console.log('My Players');
+  console.log('Finding My Players...');
+  let myPlayers = [];
+  MY_PLAYERS_DATA.forEach((player) => myPlayers.push(findPlayer(player,completePlayersData)));
   console.log('------------------------');
-  console.table(filteredPlayers);
-  console.log('Finding Unsafe Players...');
-  findUnsafePlayers(filteredPlayers);
+  console.table(myPlayers);
+  return myPlayers;
 }
 
 function getData(iselRowValue) {
@@ -92,7 +92,15 @@ function getData(iselRowValue) {
     )
     .then(response => {
       console.log('got players data');
-      findMyPlayers(response.data.aaData);
+      let completePlayersData = response.data.aaData;
+      let myPlayers = findMyPlayers(completePlayersData);
+      let unsafePlayers = findUnsafePlayers(myPlayers);
+      let bestReplacements;
+      if(unsafePlayers.length) {
+        bestReplacements = findBestReplacements(unsafePlayers, completePlayersData);
+      }
+      let top8Buys = findTop8Buys(completePlayersData);
+      EMAIL.sendMail(unsafePlayers, top8Buys);
     })
     .catch(err => {
       console.log('got error while fetching players data');

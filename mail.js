@@ -3,7 +3,7 @@ const constants = require('./constants/prod');
 const nodemailer = require('nodemailer');
 
 // async..await is not allowed in global scope, must use a wrapper
-async function sendMail(text) {
+async function email(subject,text) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
     // let testAccount = await nodemailer.createTestAccount();
@@ -37,7 +37,7 @@ async function sendMail(text) {
     let info = await transporter.sendMail({
         from: '"Fpl Transfer Alert 👻" <findhariharand@gmail.com>', // sender address
         to: 'hariharand96@gmail.com', // list of receivers
-        subject: 'Sell these players', // Subject line
+        subject: subject, // Subject line
         text: text, // plain text body
         // html: '<b>Hello world?</b>' // html body
     });
@@ -48,6 +48,73 @@ async function sendMail(text) {
     // Preview only available when sending through an Ethereal account
     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
     // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+}
+
+function addTopPlayers(top8Buys) {
+    let message = 'Top 8 Buys\n';
+    message += '----------------------------------------------------\n\n';
+    top8Buys.forEach(
+        player =>
+          message += `${player[1]} - ${player[2]}, ${player[7]}, ${player[12]}, Opps: ${
+            player[16]
+          }\n\n`
+      );
+    message += '----------------------------------------------------\n\n';
+    return message;
+}
+
+function addUnsafePlayers(unsafePlayers) {
+    let message = '----------------------------------------------------\n';
+    message += 'PLAYERS TO BE SOLD\n';
+    message += '----------------------------------------------------\n\n';
+    if(unsafePlayers.length) {
+        unsafePlayers.forEach(
+            player =>
+              message += `${player[1]} - ${player[2]}, ${player[12]}, Buffer: ${
+                player[10]
+              }\n\n`
+          );
+    } else {
+        message += 'No Player at risk \n\n';
+    }
+    message += '----------------------------------------------------\n';
+    return message;
+}
+
+/**
+ *  [
+            "",(0)(unknown)
+            "Mustafi",(1)(name)
+            "Arsenal",(2)(team)
+            "D",(3)(position)
+            "A",(4)(status)
+            "0.5",(5)(owned)
+            "5.4",(6)
+            "£5.4m",(7)(price)
+            "0",(8)()
+            "---",(9)
+            "2525",(10)
+            "-33.3",(11)
+            "-33.3",(12)(target)
+            "-2",(13)
+            "-2",(14)
+            "Mustafi",(15)
+            "Spurs(H) Watford(A) Aston Villa(H) Man Utd(A) "(16)(opp teams)
+    ]
+ * @param {*} unsafePlayers
+ */
+
+function sendMail(unsafePlayers, top8Buys) {
+    let subject = '☺ All players are safe ☺ ';
+    let msg = '';
+    if(unsafePlayers.length) {
+        subject = '⚠ TRANSFER ACTION NEEDED ⚠';
+    }
+    msg += addUnsafePlayers(unsafePlayers);
+    msg += addTopPlayers(top8Buys);
+    console.log(msg);
+    console.log('Calling Mail Fn');
+    email(subject, msg);
 }
 
 
