@@ -105,6 +105,7 @@ function getData(iselRowValue) {
     .catch(err => {
       console.log('got error while fetching players data');
       console.log(err);
+      EMAIL.sendErrorMail(err);
     });
 }
 

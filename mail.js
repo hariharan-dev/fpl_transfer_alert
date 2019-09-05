@@ -50,15 +50,21 @@ async function email(subject,text) {
     // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 }
 
+function getPlayerFormat(isUnsafePlayer, player) {
+    if(isUnsafePlayer) {
+       return `${player[1]}(${player[3]}) - ${player[2]}, ${player[7]}, ${player[12]}, Opps: ${
+            player[16]
+          }\n Buffer: ${player[10]} \n\n`;
+    }
+    return `${player[1]}(${player[3]}) - ${player[2]}, ${player[7]}, ${player[12]}, Opps: ${
+        player[16]
+      }\n\n`;
+}
+
 function addTopPlayers(top8Buys) {
     let message = 'Top 8 Buys\n';
     message += '----------------------------------------------------\n\n';
-    top8Buys.forEach(
-        player =>
-          message += `${player[1]} - ${player[2]}, ${player[7]}, ${player[12]}, Opps: ${
-            player[16]
-          }\n\n`
-      );
+    top8Buys.forEach(player => message += getPlayerFormat(false, player));
     message += '----------------------------------------------------\n\n';
     return message;
 }
@@ -68,12 +74,7 @@ function addUnsafePlayers(unsafePlayers) {
     message += 'PLAYERS TO BE SOLD\n';
     message += '----------------------------------------------------\n\n';
     if(unsafePlayers.length) {
-        unsafePlayers.forEach(
-            player =>
-              message += `${player[1]} - ${player[2]}, ${player[12]}, Buffer: ${
-                player[10]
-              }\n\n`
-          );
+        unsafePlayers.forEach(player => message += getPlayerFormat(true, player));
     } else {
         message += 'No Player at risk \n\n';
     }
@@ -117,5 +118,14 @@ function sendMail(unsafePlayers, top8Buys) {
     email(subject, msg);
 }
 
+function sendErrorMail(errorTrace) {
+    let subject = '❌ FPL TRANSFER LOOKUP FAILED ❌';
+    let msg = '';
+    msg += errorTrace
+    console.log(msg);
+    console.log('Sending Error Mail');
+    email(subject, msg);
+}
 
-module.exports = { sendMail };
+
+module.exports = { sendMail, sendErrorMail };
