@@ -1,6 +1,6 @@
 module.exports = [
   { last_name: 'Abraham', club: 'Chelsea' },
-  { last_name: 'Kane', club: 'Spurs' },
+  { last_name: 'Pukki', club: 'Norwich' },
   { last_name: 'Firmino', club: 'Liverpool' },
   { last_name: 'Mount', club: 'Chelsea' },
   { last_name: 'Sterling', club: 'Man City' },
