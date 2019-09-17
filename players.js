@@ -5,7 +5,7 @@ module.exports = [
   { last_name: 'Mount', club: 'Chelsea' },
   { last_name: 'Sterling', club: 'Man City' },
   { last_name: 'Pieters', club: 'Burnley'  },
-  { last_name: 'McArthur', club: 'Crystal Palace' },
+  { last_name: 'Cantwell', club: 'Norwich' },
   { last_name: 'Hayden', club: 'Newcastle' },
   { last_name: 'Walker',club: 'Man City' },
   { last_name: 'De Bruyne',club: 'Man City' },
