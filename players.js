@@ -1,16 +1,21 @@
 module.exports = [
-  { last_name: 'Abraham', club: 'Chelsea' },
-  { last_name: 'Pukki', club: 'Norwich' },
-  { last_name: 'Firmino', club: 'Liverpool' },
-  { last_name: 'Mount', club: 'Chelsea' },
-  { last_name: 'Sterling', club: 'Man City' },
-  { last_name: 'Pieters', club: 'Burnley'  },
-  { last_name: 'Cantwell', club: 'Norwich' },
-  { last_name: 'Hayden', club: 'Newcastle' },
-  { last_name: 'Walker',club: 'Man City' },
-  { last_name: 'De Bruyne',club: 'Man City' },
-  { last_name: 'van Aanholt', club: 'Crystal Palace' },
-  { last_name: 'Kelly', club: 'Crystal Palace' },
-  { last_name: 'Simpson', club: 'Bournemouth' },
-  { last_name: 'de Gea', club: 'Man Utd' }
+  // GK
+  { last_name: 'Sánchez', club: 'Brighton' },
+  { last_name: 'Foster', club: 'Watford' },
+  // Defenders
+  { last_name: 'White', club: 'Arsenal' },
+  { last_name: 'N.Williams', club: 'Liverpool' },
+  { last_name: 'Christensen', club: 'Chelsea' },
+  { last_name: 'Alexander-Arnold', club: 'Liverpool' },
+  { last_name: 'Dias', club: 'Man City' },
+  // Midfielders
+  { last_name: 'Smith Rowe', club: 'Arsenal' },
+  { last_name: 'McArthur', club: 'Crystal Palace' },
+  { last_name: 'Salah', club: 'Liverpool' },
+  { last_name: 'Benrahma', club: 'West Ham' },
+  { last_name: 'Townsend', club: 'Everton' },
+  // Strikers
+  { last_name: 'Toney', club: 'Brentford' },
+  { last_name: 'Antonio', club: 'West Ham' },
+  { last_name: 'Lukaku', club: 'Chelsea' },
 ];
