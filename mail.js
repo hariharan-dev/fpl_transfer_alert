@@ -22,6 +22,7 @@ async function email(subject,text) {
     console.log('Creating transporter');
     let transporter = nodemailer.createTransport({
         service: 'gmail',
+        secure: true,
         auth: {
             user: constants.username, // generated ethereal user
             pass: constants.password // generated ethereal password
@@ -69,6 +70,14 @@ function addTopPlayers(top8Buys) {
     return message;
 }
 
+function addMyPlayers(myPlayers) {
+    let message = 'My Players Stat\n';
+    message += '----------------------------------------------------\n\n';
+    myPlayers.forEach(player => message += getPlayerFormat(false, player));
+    message += '----------------------------------------------------\n\n';
+    return message;
+}
+
 function addUnsafePlayers(unsafePlayers) {
     let message = '----------------------------------------------------\n';
     message += 'PLAYERS TO BE SOLD\n';
@@ -105,14 +114,15 @@ function addUnsafePlayers(unsafePlayers) {
  * @param {*} unsafePlayers
  */
 
-function sendMail(unsafePlayers, top8Buys) {
+function sendMail(myPlayers, unsafePlayers, top8Buys) {
     let subject = '☺ All players are safe ☺ ';
     let msg = '';
     if(unsafePlayers.length) {
         subject = '⚠ TRANSFER ACTION NEEDED ⚠';
+        msg += addUnsafePlayers(unsafePlayers);
     }
-    msg += addUnsafePlayers(unsafePlayers);
     msg += addTopPlayers(top8Buys);
+    msg += addMyPlayers(myPlayers);
     console.log(msg);
     console.log('Calling Mail Fn');
     email(subject, msg);

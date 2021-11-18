@@ -110,7 +110,7 @@ function getData(reqObj) {
         );
       }
       let top8Buys = findTop8Buys(completePlayersData);
-      EMAIL.sendMail(unsafePlayers, top8Buys);
+      EMAIL.sendMail(myPlayers, unsafePlayers, top8Buys);
     })
     .catch((err) => {
       console.log("got error while fetching players data");
